@@ -1,0 +1,15 @@
+
+*.csproj
+
+*.unityproj
+
+Assets/.svn/all-wcprops
+
+.svn
+*.sln
+
+*.userprefs
+
+Library
+
+Temp

@@ -1,0 +1,10 @@
+using UnityEngine;
+using System.Collections;
+
+public static class Extensions {
+$REPLACE_EXTENSIONS
+}
+
+public static class AnimatorParameters {
+$REPLACE_ANIMATORPARAMS
+}

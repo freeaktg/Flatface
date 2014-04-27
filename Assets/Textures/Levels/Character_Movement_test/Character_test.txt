@@ -1,0 +1,100 @@
+{"frames": {
+
+"01.png":
+{
+	"frame": {"x":5,"y":5,"w":386,"h":576},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":82,"y":64,"w":386,"h":576},
+	"sourceSize": {"w":592,"h":708}
+},
+"02.png":
+{
+	"frame": {"x":416,"y":5,"w":246,"h":608},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":163,"y":64,"w":246,"h":608},
+	"sourceSize": {"w":592,"h":708}
+},
+"03.png":
+{
+	"frame": {"x":687,"y":5,"w":262,"h":584},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":192,"y":66,"w":262,"h":584},
+	"sourceSize": {"w":592,"h":708}
+},
+"04.png":
+{
+	"frame": {"x":5,"y":638,"w":350,"h":582},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":119,"y":64,"w":350,"h":582},
+	"sourceSize": {"w":592,"h":708}
+},
+"05.png":
+{
+	"frame": {"x":380,"y":638,"w":186,"h":586},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":250,"y":64,"w":186,"h":586},
+	"sourceSize": {"w":592,"h":708}
+},
+"06.png":
+{
+	"frame": {"x":591,"y":638,"w":202,"h":656},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":279,"y":6,"w":202,"h":656},
+	"sourceSize": {"w":592,"h":708}
+},
+"07.png":
+{
+	"frame": {"x":5,"y":1319,"w":306,"h":372},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":153,"y":83,"w":306,"h":372},
+	"sourceSize": {"w":592,"h":708}
+},
+"08.png":
+{
+	"frame": {"x":336,"y":1319,"w":232,"h":650},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":218,"y":0,"w":232,"h":650},
+	"sourceSize": {"w":592,"h":708}
+},
+"09.png":
+{
+	"frame": {"x":593,"y":1319,"w":112,"h":608},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":290,"y":65,"w":112,"h":608},
+	"sourceSize": {"w":592,"h":708}
+},
+"10.png":
+{
+	"frame": {"x":730,"y":1319,"w":114,"h":608},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":288,"y":65,"w":114,"h":608},
+	"sourceSize": {"w":592,"h":708}
+},
+"11.png":
+{
+	"frame": {"x":869,"y":1319,"w":114,"h":608},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":288,"y":65,"w":114,"h":608},
+	"sourceSize": {"w":592,"h":708}
+}},
+"meta": {
+	"app": "http://www.codeandweb.com/texturepacker ",
+	"version": "1.0",
+	"image": "Character_test.png",
+	"format": "RGBA8888",
+	"size": {"w":1024,"h":2048},
+	"scale": "1",
+	"smartupdate": "$TexturePacker:SmartUpdate:95e7872a64506536affb10e2f9922396:58dd6a0041be196dc54442666ccbf912:e69a62382e05c6087e6c427987c8a875$"
+}
+}
