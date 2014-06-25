@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class Skill : MonoBehaviourEx {
+public abstract class Skill : MonoBehaviourEx {
 
 	public PlatformerController Player { get; private set; }
 

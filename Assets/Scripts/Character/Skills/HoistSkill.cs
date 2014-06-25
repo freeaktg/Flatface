@@ -16,7 +16,9 @@ public class HoistSkill : Skill {
 		highHoistTrigger = new AnimatorParam<AnimatorTrigger> (Components.Animator, "HighHoist");
 	}
 
-	public void OnHandsListenerEnter(Collider col) {
+	public void OnHandsEnter(Collider col) {
+		if (col.tag != "Hoistable")
+			return;
 		float height = col.bounds.max.y;
 		if (Mathf.Abs (HighHoistHandTarget.transform.position.y - height) < MaxHoistGap)
 			StartCoroutine_Auto (HighHoist (height));

@@ -17,11 +17,11 @@ public class ToggleColliderVisuals : EditorWindow {
 	}
 
 	static void ToggleVisuals(bool on) {
-		GameObject[] colliders = 
-		GameObject.FindGameObjectsWithTag("Physics");
-		foreach (GameObject col in colliders) {
-			if (col.renderer)
-				col.renderer.enabled = on;
+		MeshRenderer[] colliders = 
+			MeshRenderer.FindObjectsOfType(typeof(MeshRenderer)) as MeshRenderer[];
+		foreach (MeshRenderer col in colliders) {
+			if (col.sharedMaterial && col.sharedMaterial.name.Replace(" (Instance)", "").EndsWith("_p"))
+				col.enabled = on;
 		}
 	}
 }

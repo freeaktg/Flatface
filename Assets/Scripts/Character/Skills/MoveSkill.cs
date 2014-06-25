@@ -20,6 +20,7 @@ public class MoveSkill : Skill {
 	float							jumpHorizontalSpeed;
 	const float						MAX_HANG_TIME = 0.1f;
 	float							hangTime;
+	PushSkill						pushSkill;
 	#endregion
 
 	#region Parameters
@@ -45,9 +46,14 @@ public class MoveSkill : Skill {
 	#endregion
 
 	public override void OnAwake() {
+		base.OnAwake();
 		jumpTrigger = new AnimatorParam<AnimatorTrigger>(Components.Animator, "Jumping");
 		leftParam = new AnimatorParam<bool>(Components.Animator, "Left");
 		rightParam = new AnimatorParam<bool>(Components.Animator, "Right");
+	}
+
+	public override void OnStart() {
+		pushSkill = GetComponent<PushSkill>();
 	}
 
 	public override void OnUpdate() {
@@ -71,11 +77,13 @@ public class MoveSkill : Skill {
 				leftParam.Set(false);
 				movementSpeed = RunVelocity;
 				FacingDirection = 1;
-			} else {
+			} else  {
 				rightParam.Set(false);
 				leftParam.Set(false);
 				movementSpeed = 0;
 			}
+			if (pushSkill && pushSkill.Pushing)
+				movementSpeed = Player.GetFacingDirection() * pushSkill.PushSpeed;
 		} else {
 			rightParam.Set(false);
 			leftParam.Set(false);

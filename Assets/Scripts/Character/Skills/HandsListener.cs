@@ -3,13 +3,17 @@ using System.Collections;
 
 public class HandsListener : MonoBehaviour {
 
-	HoistSkill hoistSkill;
+	PlatformerController player;
 
 	void Awake() {
-		hoistSkill = transform.parent.GetComponent<HoistSkill> ();
+		player = transform.parent.GetComponent<PlatformerController> ();
 	}
 
 	void OnTriggerEnter(Collider col) {
-		hoistSkill.OnHandsListenerEnter (col);
+		player.SendMessage("OnHandsEnter", col, SendMessageOptions.DontRequireReceiver);
+	}
+
+	void OnTriggerExit(Collider col) {
+		player.SendMessage("OnHandsExit", col, SendMessageOptions.DontRequireReceiver);
 	}
 }

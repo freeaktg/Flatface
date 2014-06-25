@@ -57,6 +57,10 @@ public class AnimatorParam<TParam> {
 
 		}
 	}
+
+	public static implicit operator TParam(AnimatorParam<TParam> animatorParam) {
+		return animatorParam.currentValue;
+	}
 }
 
 public class AnimatorTrigger { }
