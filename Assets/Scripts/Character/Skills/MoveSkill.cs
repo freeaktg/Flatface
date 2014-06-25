@@ -83,7 +83,7 @@ public class MoveSkill : Skill {
 				movementSpeed = 0;
 			}
 			if (pushSkill && pushSkill.Pushing)
-				movementSpeed = Player.GetFacingDirection() * pushSkill.PushSpeed;
+				movementSpeed = Player.GetFacingDirection() * pushSkill.CurrentPushSpeed;
 		} else {
 			rightParam.Set(false);
 			leftParam.Set(false);

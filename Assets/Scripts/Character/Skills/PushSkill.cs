@@ -7,12 +7,14 @@ public class PushSkill : Skill {
 	public float RaycastDistance = 0.5f;
 	
 	AnimatorParam<bool>				pushing;
+	AnimatorParam<bool>				pushIdle;
 	Rigidbody						m_pushable;
 	float							pushableOffset;
 	CharacterController				charController;
 
 	public override void OnStart() {
 		pushing = new AnimatorParam<bool>(Components.Animator, "Pushing");
+		pushIdle = new AnimatorParam<bool>(Components.Animator, "PushIdle");
 		charController = GetComponent<CharacterController>();
 	}
 
@@ -25,6 +27,17 @@ public class PushSkill : Skill {
 		}
 	}
 
+	public bool PushIdle {
+		get {
+			return pushIdle;
+		}
+		set {
+			pushIdle.Set(value);
+		}
+	}
+
+	public float CurrentPushSpeed { get; private set; }
+
 	public override void OnUpdate() {
 		if (m_pushable) {
 			Vector3 pushablePos = m_pushable.transform.position;
@@ -33,6 +46,13 @@ public class PushSkill : Skill {
 			if (m_pushable.transform.eulerAngles.z > 10 && m_pushable.transform.eulerAngles.z < 350) {
 				m_pushable = null;
 				Pushing = false;
+				PushIdle = false;
+			} else if (InputManager.LeftArrow() || InputManager.RightArrow()) {
+				PushIdle = false;
+				CurrentPushSpeed = PushSpeed;
+			} else {
+				PushIdle = true;
+				CurrentPushSpeed = 0;
 			}
 		}
 		RaycastHit hit;
