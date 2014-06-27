@@ -8,14 +8,18 @@ public class PushSkill : Skill {
 	
 	AnimatorParam<bool>				pushing;
 	AnimatorParam<bool>				pushIdle;
+	AnimatorParam<bool>				pulling;
 	Rigidbody						m_pushable;
 	float							pushableOffset;
 	CharacterController				charController;
+	MoveSkill						moveSkill;
 
 	public override void OnStart() {
 		pushing = new AnimatorParam<bool>(Components.Animator, "Pushing");
 		pushIdle = new AnimatorParam<bool>(Components.Animator, "PushIdle");
+		pulling = new AnimatorParam<bool>(Components.Animator, "Pulling");
 		charController = GetComponent<CharacterController>();
+		moveSkill = GetComponent<MoveSkill>();
 	}
 
 	public bool Pushing {
@@ -24,6 +28,15 @@ public class PushSkill : Skill {
 		}
 		private set {
 			pushing.Set(value);
+		}
+	}
+
+	public bool Pulling {
+		get {
+			return pulling;
+		}
+		set {
+			pulling.Set(value);
 		}
 	}
 
@@ -54,13 +67,14 @@ public class PushSkill : Skill {
 				PushIdle = true;
 				CurrentPushSpeed = 0;
 			}
+			Pulling = Player.GetFacingDirection() != Mathf.Sign(moveSkill.movementSpeed) && moveSkill.movementSpeed != 0;
 		}
 		RaycastHit hit;
 		if (Physics.Raycast(new Ray(transform.position + Vector3.up * charController.height * transform.localScale.y * 0.5f, 
 		                            Vector3.right * Player.GetFacingDirection()), out hit, RaycastDistance, 1 << 9)) {
 			OnHandsEnter(hit.collider);
-		} else if (m_pushable != null)
-			OnHandsExit(hit.collider);
+		} else if (m_pushable != null && !Pulling && !PushIdle)
+			OnHandsExit(m_pushable.collider);
 	}
 
 	void OnHandsEnter(Collider col) {
