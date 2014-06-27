@@ -16,7 +16,6 @@ public class MoveSkill : Skill {
 	AnimatorParam<bool>				rightParam;
 	CollisionFlags					colFlags;
 	Vector2 						velocity;
-	float							movementSpeed;
 	float							jumpHorizontalSpeed;
 	const float						MAX_HANG_TIME = 0.1f;
 	float							hangTime;
@@ -24,6 +23,7 @@ public class MoveSkill : Skill {
 	#endregion
 
 	#region Parameters
+	public float					movementSpeed { get; private set; }
 	public bool IsGrounded {
 		get {
 			return (colFlags & CollisionFlags.Below) != 0 || hangTime < MAX_HANG_TIME;
@@ -60,7 +60,7 @@ public class MoveSkill : Skill {
 		if (IsGrounded) {
 			if ((colFlags & CollisionFlags.Below) != 0)
 				jumpHorizontalSpeed = 0f;
-			if (InputManager.JumpButtonDown()) {
+			if (InputManager.JumpButtonDown() && !pushSkill.Pushing) {
 				jumpTrigger.Set();
 				velocity.y += JumpVelocity.y;
 				jumpHorizontalSpeed = JumpVelocity.x * FacingDirection;
@@ -71,19 +71,21 @@ public class MoveSkill : Skill {
 				leftParam.Set(true);
 				rightParam.Set(false);
 				movementSpeed = -RunVelocity;
-				FacingDirection = -1;
+				if (!pushSkill.Pushing)
+					FacingDirection = -1;
 			} else if (InputManager.RightArrow()) {
 				rightParam.Set(true);
 				leftParam.Set(false);
 				movementSpeed = RunVelocity;
-				FacingDirection = 1;
+				if (!pushSkill.Pushing)
+					FacingDirection = 1;
 			} else  {
 				rightParam.Set(false);
 				leftParam.Set(false);
 				movementSpeed = 0;
 			}
 			if (pushSkill && pushSkill.Pushing)
-				movementSpeed = Player.GetFacingDirection() * pushSkill.CurrentPushSpeed;
+				movementSpeed = Mathf.Sign(movementSpeed) * pushSkill.CurrentPushSpeed;
 		} else {
 			rightParam.Set(false);
 			leftParam.Set(false);
