@@ -10,7 +10,7 @@ public class PushSkill : Skill {
 	AnimatorParam<bool>				pushIdle;
 	AnimatorParam<bool>				pulling;
 	Rigidbody						m_pushable;
-	float							pushableOffset;
+	Vector3							pushableOffset;
 	CharacterController				charController;
 	MoveSkill						moveSkill;
 
@@ -62,10 +62,12 @@ public class PushSkill : Skill {
 			}
 		}
 		if (m_pushable && Pushing) {
-			Vector3 pushablePos = m_pushable.transform.position;
-			pushablePos.x = transform.position.x + pushableOffset;
-			m_pushable.transform.position = pushablePos;
-			if (m_pushable.transform.eulerAngles.z > 10 && m_pushable.transform.eulerAngles.z < 350) {
+			if (!PushIdle) {
+				Vector3 pushablePos = m_pushable.transform.position;
+				pushablePos.x = transform.position.x + pushableOffset.x;
+				m_pushable.transform.position = pushablePos;
+			}
+			if (isFalling(m_pushable)) {
 				m_pushable = null;
 				Pushing = false;
 				Pulling = false;
@@ -82,27 +84,37 @@ public class PushSkill : Skill {
 		}
 		RaycastHit hit;
 		if (Physics.Raycast(new Ray(transform.position + Vector3.up * charController.height * transform.localScale.y * 0.5f
-		                            + Vector3.right * Player.GetFacingDirection() * (RaycastDistance * 0.5f), 
-		                            Vector3.right * Player.GetFacingDirection()), out hit, RaycastDistance * 0.5f, 1 << 9)) {
-			OnHandsEnter(hit.collider);
-		} else if (m_pushable != null && !Pulling && !PushIdle)
-			OnHandsExit(m_pushable.collider);
+		                            ,//+ Vector3.right * Player.GetFacingDirection() * (RaycastDistance * 0.5f), 
+		                            Vector3.right * Player.GetFacingDirection()), out hit, RaycastDistance * 1f, 1 << 9)) {
+			OnHandsEnterRaycast(hit.collider);
+		} else if (m_pushable != null && !Pulling)
+			OnHandsExitRaycast(m_pushable.collider);
 	}
 
-	void OnHandsEnter(Collider col) {
-		float z_rot = col.transform.eulerAngles.z;
+	bool isFalling(Rigidbody body) {
+		return false;
+		//return Mathf.Abs(body.angularVelocity.z) > 1f && (m_pushable == null || m_pushable.velocity.y < -0.03f);
+	}
+
+	void OnHandsEnterRaycast(Collider col) {
 		float x_dist = col.transform.position.x - transform.position.x;
-		if (col.tag == "Pushable" && (z_rot < 10 || z_rot > 350) && Mathf.Sign(x_dist) == Player.GetFacingDirection()) {
+		if (col.tag == "Pushable" && !isFalling(col.rigidbody) && Mathf.Sign(x_dist) == Player.GetFacingDirection()) {
 			m_pushable = col.rigidbody;
-			pushableOffset = m_pushable.transform.position.x - transform.position.x;
+			pushableOffset = m_pushable.transform.position - transform.position;
 		}
 	}
 
-	void OnHandsExit(Collider col) {
+	void OnHandsExitRaycast(Collider col) {
 		if (col.tag == "Pushable") {
-			Pushing = false;
-			m_pushable = null;
+			Release();
 		}
+	}
+
+	public void Release() {
+		Pushing = false;
+		Pulling = false;
+		PushIdle = false;
+		m_pushable = null;
 	}
 
 	void _OnControllerColliderHit(ControllerColliderHit hit) {
