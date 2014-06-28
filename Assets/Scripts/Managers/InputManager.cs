@@ -14,4 +14,8 @@ public class InputManager {
 	public static bool LeftArrow() {
 		return Input.GetKey(KeyCode.LeftArrow);
 	}
+
+	public static bool TouchButtonDown() {
+		return Input.GetKeyDown(KeyCode.LeftCommand) || Input.GetKeyDown(KeyCode.LeftControl);
+	}
 }

@@ -53,6 +53,15 @@ public class PushSkill : Skill {
 
 	public override void OnUpdate() {
 		if (m_pushable) {
+			if (InputManager.TouchButtonDown()) {
+				Pushing = !Pushing;
+				if (!Pushing) {
+					PushIdle = false;
+					Pulling = false;
+				}
+			}
+		}
+		if (m_pushable && Pushing) {
 			Vector3 pushablePos = m_pushable.transform.position;
 			pushablePos.x = transform.position.x + pushableOffset;
 			m_pushable.transform.position = pushablePos;
@@ -84,7 +93,6 @@ public class PushSkill : Skill {
 		float z_rot = col.transform.eulerAngles.z;
 		float x_dist = col.transform.position.x - transform.position.x;
 		if (col.tag == "Pushable" && (z_rot < 10 || z_rot > 350) && Mathf.Sign(x_dist) == Player.GetFacingDirection()) {
-			Pushing = true;
 			m_pushable = col.rigidbody;
 			pushableOffset = m_pushable.transform.position.x - transform.position.x;
 		}
