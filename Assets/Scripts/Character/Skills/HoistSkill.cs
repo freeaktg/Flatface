@@ -5,15 +5,21 @@ using System.Collections.Generic;
 public class HoistSkill : Skill {
 
 	public GameObject HighHoistHandTarget;
-	public GameObject LowHoistListenerTarget;
+	public GameObject LowHoistHandTarget;
 	public float MaxHoistGap = 0.1f;
 	public float HighHoistTime = 1f;
+	public float LowHoistTime = 1f;
 	public Vector2 HighHoistOffset;
+	public Vector2 LowHoistOffset;
 
 	AnimatorParam<AnimatorTrigger> highHoistTrigger;
+	AnimatorParam<AnimatorTrigger> lowHoistTrigger;
+	Animator animator;
 
 	void Start() {
 		highHoistTrigger = new AnimatorParam<AnimatorTrigger> (Components.Animator, "HighHoist");
+		lowHoistTrigger = new AnimatorParam<AnimatorTrigger> (Components.Animator, "LowHoist");
+		animator = GetComponent<Animator>();
 	}
 
 	public void OnHandsEnter(Collider col) {
@@ -21,28 +27,54 @@ public class HoistSkill : Skill {
 			return;
 		float height = col.bounds.max.y;
 		if (Mathf.Abs (HighHoistHandTarget.transform.position.y - height) < MaxHoistGap)
-			StartCoroutine_Auto (HighHoist (height));
+			Hoist (height, true);
+		if (Mathf.Abs (LowHoistHandTarget.transform.position.y - height) < MaxHoistGap)
+			Hoist (height, false);
 	}
 
-	IEnumerator HighHoist(float height) {
-		highHoistTrigger.Set();
-		float time = 0;
-		Vector3 startPos = transform.position;
-		Vector3 off = HighHoistOffset;
-		off.x *= Player.GetFacingDirection ();
-		Vector3 endPos = startPos + off;
-		endPos.y = height + HighHoistOffset.y;
-		while (time < HighHoistTime) {
-			time += Time.deltaTime;
-			float f = time / HighHoistTime;
-			transform.position = Vector3.Lerp(startPos, endPos, f);
-			yield return 0;
+	bool hoisting, high, hoistStarted;
+	float hoistEnd;
+	void Hoist(float height, bool high) {
+		if (high)
+			highHoistTrigger.Set();
+		else
+			lowHoistTrigger.Set();
+		hoisting = true;
+		this.high = high;
+	}
+
+	public void HoistEnd() {
+		Debug.Log(Player.SpriteTransform.localPosition);
+	}
+
+	Vector3 hoistPos;
+	public override void OnUpdate() {
+		if (hoisting && hoistStarted) {
+			string stateName = high ? "hoist_high" : "hoist_low";
+			hoistPos = Player.SpriteTransform.position;
 		}
-		transform.position = endPos;
+	}
+
+	public override void OnLateUpdate() {
+		if (hoisting) {
+			string stateName = high ? "hoist_high" : "hoist_low";
+			if (!hoistStarted && animator.GetCurrentAnimatorStateInfo(0).IsName(stateName))
+				hoistStarted = true;
+			if (hoistStarted) {
+				if (!animator.GetCurrentAnimatorStateInfo(0).IsName(stateName)) {
+					hoisting = false;
+					hoistStarted = false;
+					transform.position = hoistPos + new Vector3(0f, 0.1f, 0f);
+					Player.SpriteTransform.position = Vector2.zero;
+				}
+			}
+		}
 	}
 
 	void OnDrawGizmosSelected() {
 		Gizmos.color = Color.cyan;
 		Gizmos.DrawWireCube (transform.position + (Vector3)HighHoistOffset, Vector3.one * 0.1f);
+		Gizmos.color = Color.magenta;
+		Gizmos.DrawWireCube (transform.position + (Vector3)LowHoistOffset, Vector3.one * 0.1f);
 	}
 }
