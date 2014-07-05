@@ -5,6 +5,7 @@ using System.Collections.Generic;
 public class PlatformerController : MonoBehaviour {
 
 	public Transform SpriteTransform;
+	public Animator Animator { get; private set; }
 
 	public enum Actions {
 		Jump,
@@ -12,6 +13,10 @@ public class PlatformerController : MonoBehaviour {
 	}
 
 	List<Skill> allSkills = new List<Skill>();
+
+	void Awake() {
+		Animator = GetComponent<Animator>();
+	}
 
 	public int GetFacingDirection() {
 		return Mathf.FloorToInt(Mathf.Sign(transform.localScale.x));
@@ -30,6 +35,20 @@ public class PlatformerController : MonoBehaviour {
 		foreach (Skill skill in allSkills)
 			multiplier *= skill.GetMoveSpeed();
 		return multiplier;
+	}
+
+	public float GetGravity() {
+		float multiplier = 1f;
+		foreach (Skill skill in allSkills)
+			multiplier *= skill.GetGravity();
+		return multiplier;
+	}
+
+	public float GetVerticalSpeed() {
+		float vertical = 0f;
+		foreach (Skill skill in allSkills)
+			vertical += skill.GetVerticalSpeed();
+		return vertical;
 	}
 
 	public void AddSkill(Skill skill) {

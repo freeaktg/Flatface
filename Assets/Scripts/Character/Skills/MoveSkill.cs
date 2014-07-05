@@ -15,13 +15,14 @@ public class MoveSkill : Skill {
 	AnimatorParam<bool>				leftParam;
 	AnimatorParam<bool>				rightParam;
 	CollisionFlags					colFlags;
-	Vector2 						velocity;
 	float							jumpHorizontalSpeed;
 	const float						MAX_HANG_TIME = 0.1f;
 	float							hangTime;
 	#endregion
 
 	#region Parameters
+	[System.NonSerialized]
+	public Vector2 					velocity;
 	public float					movementSpeed { get; private set; }
 	public bool IsGrounded {
 		get {
@@ -62,13 +63,13 @@ public class MoveSkill : Skill {
 				leftParam.Set(false);
 				rightParam.Set(false);
 				movementSpeed = 0f;
-			} else if (InputManager.LeftArrow()) {
+			} else if (InputManager.Left()) {
 				leftParam.Set(true);
 				rightParam.Set(false);
 				movementSpeed = -RunVelocity;
 				if (!Player.IsActionBlocked(PlatformerController.Actions.ChangeDirection))
 					FacingDirection = -1;
-			} else if (InputManager.RightArrow()) {
+			} else if (InputManager.Right()) {
 				rightParam.Set(true);
 				leftParam.Set(false);
 				movementSpeed = RunVelocity;
@@ -87,14 +88,14 @@ public class MoveSkill : Skill {
 	}
 
 	void FixedUpdate() {
-		velocity.y += Time.deltaTime * GlobalSettings.Instance.Gravity;
-	
+		velocity.y += Time.deltaTime * GlobalSettings.Instance.Gravity * Player.GetGravity();
 		Vector2 realMovement = velocity;
 		if ((colFlags & CollisionFlags.Below) != 0)
 			realMovement += Vector2.right * movementSpeed;
 		else
 			realMovement += Vector2.right * jumpHorizontalSpeed;
 		jumpHorizontalSpeed *= HorizontalJumpDamping;
+		realMovement.y += Player.GetVerticalSpeed();
 		realMovement *= Time.deltaTime;
 
 		colFlags = Components.CharacterController.Move(realMovement);

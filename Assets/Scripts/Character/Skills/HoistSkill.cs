@@ -34,7 +34,7 @@ public class HoistSkill : Skill {
 
 	bool hoisting, high, hoistStarted;
 	float hoistEnd;
-	void Hoist(float height, bool high) {
+	public void Hoist(float height, bool high) {
 		if (high)
 			highHoistTrigger.Set();
 		else
@@ -53,7 +53,11 @@ public class HoistSkill : Skill {
 	}
 
 	public override float GetMoveSpeed() {
-		return hoisting ? 0f : 1f;
+		return Hoisting ? 0f : 1f;
+	}
+
+	public override float GetGravity() {
+		return Hoisting ? 0f : 1f;
 	}
 
 	Vector3 hoistPos;

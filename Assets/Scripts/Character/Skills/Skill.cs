@@ -17,4 +17,12 @@ public abstract class Skill : MonoBehaviourEx {
 	public virtual float GetMoveSpeed() {
 		return 1f;
 	}
+
+	public virtual float GetGravity() {
+		return 1f;
+	}
+
+	public virtual float GetVerticalSpeed() {
+		return 0f;
+	}
 }

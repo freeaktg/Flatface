@@ -72,7 +72,7 @@ public class PushSkill : Skill {
 				Pushing = false;
 				Pulling = false;
 				PushIdle = false;
-			} else if (InputManager.LeftArrow() || InputManager.RightArrow()) {
+			} else if (InputManager.Left() || InputManager.Right()) {
 				PushIdle = false;
 				CurrentPushSpeed = PushSpeed;
 			} else {
