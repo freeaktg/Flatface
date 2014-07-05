@@ -64,8 +64,8 @@ public class HoistSkill : Skill {
 				if (!animator.GetCurrentAnimatorStateInfo(0).IsName(stateName)) {
 					hoisting = false;
 					hoistStarted = false;
-					transform.position = hoistPos + new Vector3(0f, 0.1f, 0f);
-					Player.SpriteTransform.position = Vector2.zero;
+					transform.position = hoistPos + new Vector3(0f, high ? 0.2f : 0.2f, 0f);
+					Player.SpriteTransform.localPosition = Vector2.zero;
 				}
 			}
 		}
