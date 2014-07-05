@@ -43,15 +43,28 @@ public class HoistSkill : Skill {
 		this.high = high;
 	}
 
-	public void HoistEnd() {
-		Debug.Log(Player.SpriteTransform.localPosition);
+	public override bool IsActionBlocked(PlatformerController.Actions action) {
+		switch (action) {
+			case PlatformerController.Actions.Jump:
+			case PlatformerController.Actions.ChangeDirection:
+				return hoisting;
+		}
+		return false;
+	}
+
+	public override float GetMoveSpeed() {
+		return hoisting ? 0f : 1f;
 	}
 
 	Vector3 hoistPos;
 	public override void OnUpdate() {
-		if (hoisting && hoistStarted) {
-			string stateName = high ? "hoist_high" : "hoist_low";
+		if (hoisting && hoistStarted)
 			hoistPos = Player.SpriteTransform.position;
+	}
+
+	public bool Hoisting {
+		get {
+			return hoisting;
 		}
 	}
 

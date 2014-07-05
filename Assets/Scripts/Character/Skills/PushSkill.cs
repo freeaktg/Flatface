@@ -91,6 +91,22 @@ public class PushSkill : Skill {
 			OnHandsExitRaycast(m_pushable.collider);
 	}
 
+	public override bool IsActionBlocked(PlatformerController.Actions action) {
+		switch (action) {
+			case PlatformerController.Actions.Jump:
+				return Pushing;
+			case PlatformerController.Actions.ChangeDirection:
+				return Pushing;
+		}
+		return false;
+	}
+
+	public override float GetMoveSpeed() {
+		if (Pushing)
+			return CurrentPushSpeed;
+		return 1f;
+	}
+
 	bool isFalling(Rigidbody body) {
 		return false;
 		//return Mathf.Abs(body.angularVelocity.z) > 1f && (m_pushable == null || m_pushable.velocity.y < -0.03f);

@@ -19,7 +19,6 @@ public class MoveSkill : Skill {
 	float							jumpHorizontalSpeed;
 	const float						MAX_HANG_TIME = 0.1f;
 	float							hangTime;
-	PushSkill						pushSkill;
 	#endregion
 
 	#region Parameters
@@ -52,15 +51,11 @@ public class MoveSkill : Skill {
 		rightParam = new AnimatorParam<bool>(Components.Animator, "Right");
 	}
 
-	public override void OnStart() {
-		pushSkill = GetComponent<PushSkill>();
-	}
-
 	public override void OnUpdate() {
 		if (IsGrounded) {
 			if ((colFlags & CollisionFlags.Below) != 0)
 				jumpHorizontalSpeed = 0f;
-			if (InputManager.JumpButtonDown() && !pushSkill.Pushing) {
+			if (InputManager.JumpButtonDown() && !Player.IsActionBlocked(PlatformerController.Actions.Jump)) {
 				jumpTrigger.Set();
 				velocity.y += JumpVelocity.y;
 				jumpHorizontalSpeed = JumpVelocity.x * FacingDirection;
@@ -71,21 +66,20 @@ public class MoveSkill : Skill {
 				leftParam.Set(true);
 				rightParam.Set(false);
 				movementSpeed = -RunVelocity;
-				if (!pushSkill.Pushing)
+				if (!Player.IsActionBlocked(PlatformerController.Actions.ChangeDirection))
 					FacingDirection = -1;
 			} else if (InputManager.RightArrow()) {
 				rightParam.Set(true);
 				leftParam.Set(false);
 				movementSpeed = RunVelocity;
-				if (!pushSkill.Pushing)
+				if (!Player.IsActionBlocked(PlatformerController.Actions.ChangeDirection))
 					FacingDirection = 1;
 			} else  {
 				rightParam.Set(false);
 				leftParam.Set(false);
 				movementSpeed = 0;
 			}
-			if (pushSkill && pushSkill.Pushing)
-				movementSpeed = Mathf.Sign(movementSpeed) * pushSkill.CurrentPushSpeed;
+			movementSpeed = movementSpeed * Player.GetMoveSpeed();
 		} else {
 			rightParam.Set(false);
 			leftParam.Set(false);
