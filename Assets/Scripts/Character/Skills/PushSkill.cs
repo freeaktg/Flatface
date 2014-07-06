@@ -51,6 +51,16 @@ public class PushSkill : Skill {
 
 	public float CurrentPushSpeed { get; private set; }
 
+	public override void OnFixedUpdate() {
+		if (m_pushable && Pushing && !PushIdle) {
+			Vector3 pushablePos = m_pushable.transform.position;
+			pushablePos.x = transform.position.x + pushableOffset.x;
+			Collider[] cols = Physics.OverlapSphere(pushablePos, m_pushable.transform.localScale.x * 0.4f);
+			if (cols.Length <= 1)
+				m_pushable.MovePosition(pushablePos);
+		}
+	}
+
 	public override void OnUpdate() {
 		if (m_pushable) {
 			if (InputManager.TouchButtonDown()) {
@@ -62,11 +72,6 @@ public class PushSkill : Skill {
 			}
 		}
 		if (m_pushable && Pushing) {
-			if (!PushIdle) {
-				Vector3 pushablePos = m_pushable.transform.position;
-				pushablePos.x = transform.position.x + pushableOffset.x;
-				m_pushable.transform.position = pushablePos;
-			}
 			if (isFalling(m_pushable)) {
 				m_pushable = null;
 				Pushing = false;
@@ -113,6 +118,8 @@ public class PushSkill : Skill {
 	}
 
 	void OnHandsEnterRaycast(Collider col) {
+		if (Pushing)
+			return;
 		float x_dist = col.transform.position.x - transform.position.x;
 		if (col.tag == "Pushable" && !isFalling(col.rigidbody) && Mathf.Sign(x_dist) == Player.GetFacingDirection()) {
 			m_pushable = col.rigidbody;

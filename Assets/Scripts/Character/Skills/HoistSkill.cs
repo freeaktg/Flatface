@@ -15,11 +15,13 @@ public class HoistSkill : Skill {
 	AnimatorParam<AnimatorTrigger> highHoistTrigger;
 	AnimatorParam<AnimatorTrigger> lowHoistTrigger;
 	Animator animator;
+	MoveSkill moveSkill;
 
 	void Start() {
 		highHoistTrigger = new AnimatorParam<AnimatorTrigger> (Components.Animator, "HighHoist");
 		lowHoistTrigger = new AnimatorParam<AnimatorTrigger> (Components.Animator, "LowHoist");
 		animator = GetComponent<Animator>();
+		moveSkill = GetComponent<MoveSkill>();
 	}
 
 	public void OnHandsEnter(Collider col) {
@@ -40,6 +42,7 @@ public class HoistSkill : Skill {
 		else
 			lowHoistTrigger.Set();
 		hoisting = true;
+		moveSkill.velocity = Vector2.zero;
 		this.high = high;
 	}
 
