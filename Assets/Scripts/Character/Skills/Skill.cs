@@ -25,4 +25,8 @@ public abstract class Skill : MonoBehaviourEx {
 	public virtual float GetVerticalSpeed() {
 		return 0f;
 	}
+
+	public virtual bool UpdatePosition() {
+		return false;
+	}
 }

@@ -54,4 +54,13 @@ public class PlatformerController : MonoBehaviour {
 	public void AddSkill(Skill skill) {
 		allSkills.Add(skill);
 	}
+
+	public bool SkillsUpdatePosition() {
+		bool positionUpdated = false;
+		foreach (Skill skill in allSkills) {
+			if (skill.UpdatePosition())
+				positionUpdated = true;
+		}
+		return positionUpdated;
+	}
 }

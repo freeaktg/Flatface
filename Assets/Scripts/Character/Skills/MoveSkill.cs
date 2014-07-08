@@ -88,6 +88,8 @@ public class MoveSkill : Skill {
 	}
 
 	void FixedUpdate() {
+		if (Player.SkillsUpdatePosition())
+			return;
 		velocity.y += Time.deltaTime * GlobalSettings.Instance.Gravity * Player.GetGravity();
 		Vector2 realMovement = velocity;
 		if ((colFlags & CollisionFlags.Below) != 0)
@@ -103,6 +105,6 @@ public class MoveSkill : Skill {
 			velocity.y = Mathf.Max(0f, velocity.y);
 			hangTime = 0f;
 		} else
-				hangTime += Time.deltaTime;
+			hangTime += Time.deltaTime;
 	}
 }
