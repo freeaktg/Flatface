@@ -5,6 +5,7 @@ using System.Collections.Generic;
 public class PlatformerController : MonoBehaviour {
 
 	public Transform SpriteTransform;
+	public float Height;
 	public Animator Animator { get; private set; }
 
 	public enum Actions {
@@ -62,5 +63,18 @@ public class PlatformerController : MonoBehaviour {
 				positionUpdated = true;
 		}
 		return positionUpdated;
+	}
+
+	void OnDrawGizmosSelected() {
+		CircleCollider2D circle = GetComponent<CircleCollider2D>();
+		Vector3 d = transform.position + (Vector3)Mul(circle.center, (Vector2)transform.localScale) +
+			Vector3.down * circle.radius * transform.localScale.y;
+		Gizmos.color = Color.blue;
+		Gizmos.DrawLine(d, d + Vector3.up * Height);
+
+	}
+
+	Vector2 Mul(Vector2 v1, Vector2 v2) {
+		return new Vector2(v1.x * v2.x, v1.y * v2.y);
 	}
 }

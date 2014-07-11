@@ -18,6 +18,8 @@ public class MoveSkill : Skill {
 	float							jumpHorizontalSpeed;
 	const float						MAX_HANG_TIME = 0.1f;
 	float							hangTime;
+	Rigidbody2D						body;
+	Collider2D						circle;
 	#endregion
 
 	#region Parameters
@@ -50,6 +52,8 @@ public class MoveSkill : Skill {
 		jumpTrigger = new AnimatorParam<AnimatorTrigger>(Components.Animator, "Jumping");
 		leftParam = new AnimatorParam<bool>(Components.Animator, "Left");
 		rightParam = new AnimatorParam<bool>(Components.Animator, "Right");
+		circle = GetComponent<CircleCollider2D>();
+		body = rigidbody2D;
 	}
 
 	public override void OnUpdate() {
@@ -87,6 +91,25 @@ public class MoveSkill : Skill {
 		}
 	}
 
+	Collider2D groundCollider;
+
+	void OnCollisionEnter2D(Collision2D col) {
+		if (col.contacts[0].otherCollider == circle && Mathf.Abs(Vector3.Dot(col.contacts[0].normal, Vector3.up)) > 0.8f) {
+			colFlags = CollisionFlags.Below;
+			groundCollider = col.collider;
+		}
+	}
+
+	void OnCollisionStay2D(Collision2D col) {
+		//if (col.contacts[0].otherCollider == circle)
+		//	colFlags = CollisionFlags.Below;
+	}
+
+	void OnCollisionExit2D(Collision2D col) {
+		if (col.contacts[0].otherCollider == circle && col.collider == groundCollider)
+			colFlags = CollisionFlags.None;
+	}
+
 	void FixedUpdate() {
 		if (Player.SkillsUpdatePosition())
 			return;
@@ -98,9 +121,10 @@ public class MoveSkill : Skill {
 			realMovement += Vector2.right * jumpHorizontalSpeed;
 		jumpHorizontalSpeed *= HorizontalJumpDamping;
 		realMovement.y += Player.GetVerticalSpeed();
-		realMovement *= Time.deltaTime;
-
-		colFlags = Components.CharacterController.Move(realMovement);
+		//realMovement *= Time.deltaTime;
+		body.velocity = realMovement * 1.5f;
+		//Debug.Log(body.velocity);
+		//colFlags = Components.CharacterController.Move(realMovement);
 		if (colFlags == CollisionFlags.CollidedBelow) {
 			velocity.y = Mathf.Max(0f, velocity.y);
 			hangTime = 0f;
