@@ -24,10 +24,10 @@ public class HoistSkill : Skill {
 		moveSkill = GetComponent<MoveSkill>();
 	}
 
-	public void OnHandsEnter(Collider col) {
+	public void OnHandsEnter(Collider2D col) {
 		if (col.tag != "Hoistable")
 			return;
-		float height = col.bounds.max.y;
+		float height = col.GetBounds().max.y;
 		if (Mathf.Abs (HighHoistHandTarget.transform.position.y - height) < MaxHoistGap)
 			Hoist (height, true);
 		if (Mathf.Abs (LowHoistHandTarget.transform.position.y - height) < MaxHoistGap)

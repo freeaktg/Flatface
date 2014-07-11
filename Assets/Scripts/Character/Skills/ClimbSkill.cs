@@ -69,7 +69,7 @@ public class ClimbSkill : Skill {
 		return Climbing ? 0f : 1f;
 	}
 
-	public void OnHandsEnter(Collider col) {
+	public void OnHandsEnter(Collider2D col) {
 		if (Climbing || !col.tag.Equals("Climbable"))
 			return;
 		if (col.gameObject.layer == 11) {
@@ -83,7 +83,7 @@ public class ClimbSkill : Skill {
 		Climbing = true;
 		Player.Animator.Play("climb", 0, 1000);
 		moveSkill.velocity = Vector2.zero;
-		climbableMaxY = col.bounds.max.y;
+		climbableMaxY = col.GetBounds().max.y;
 	}
 
 	public override void OnUpdate() {
@@ -97,9 +97,9 @@ public class ClimbSkill : Skill {
 			if (ropeClimbing) {
 				positionOnRopeNode += 0.05f * Speed;
 				if (InputManager.Left())
-					currentRopeNode.rigidbody.AddForceAtPosition(currentRopeNode.transform.right * -RopeSwingForce, handsPosition);
+					currentRopeNode.rigidbody2D.AddForceAtPosition(currentRopeNode.transform.right * -RopeSwingForce, handsPosition);
 				else if (InputManager.Right())
-					currentRopeNode.rigidbody.AddForceAtPosition(currentRopeNode.transform.right * RopeSwingForce, handsPosition);
+					currentRopeNode.rigidbody2D.AddForceAtPosition(currentRopeNode.transform.right * RopeSwingForce, handsPosition);
 			}
 			if (positionOnRopeNode > 1f) {
 				positionOnRopeNode -= 1f;
@@ -112,7 +112,7 @@ public class ClimbSkill : Skill {
 			if (InputManager.JumpButtonDown() || currentRopeNode == null) {
 				Climbing = false;
 				if (ropeClimbing)
-					moveSkill.velocity = currentRopeNode.rigidbody.velocity;
+					moveSkill.velocity = currentRopeNode.rigidbody2D.velocity;
 				ignoreRope = currentRope;
 				if (ropeClimbStartFacing == 1f)
 					transform.rotation = Quaternion.identity;
