@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class MoveSkill : Skill {
 
@@ -58,8 +59,6 @@ public class MoveSkill : Skill {
 
 	public override void OnUpdate() {
 		if (IsGrounded) {
-			if ((colFlags & CollisionFlags.Below) != 0)
-				jumpHorizontalSpeed = 0f;
 			if (InputManager.JumpButtonDown() && !Player.IsActionBlocked(PlatformerController.Actions.Jump)) {
 				jumpTrigger.Set();
 				velocity.y += JumpVelocity.y;
@@ -91,12 +90,14 @@ public class MoveSkill : Skill {
 		}
 	}
 
-	Collider2D groundCollider;
+	List<Collider2D> groundColliders = new List<Collider2D>();
 
 	void OnCollisionEnter2D(Collision2D col) {
 		if (col.contacts[0].otherCollider == circle && Mathf.Abs(Vector3.Dot(col.contacts[0].normal, Vector3.up)) > 0.8f) {
 			colFlags = CollisionFlags.Below;
-			groundCollider = col.collider;
+			if (!groundColliders.Contains(col.collider))
+				groundColliders.Add(col.collider);
+			jumpHorizontalSpeed = 0f;
 		}
 	}
 
@@ -106,8 +107,11 @@ public class MoveSkill : Skill {
 	}
 
 	void OnCollisionExit2D(Collision2D col) {
-		if (col.contacts[0].otherCollider == circle && col.collider == groundCollider)
-			colFlags = CollisionFlags.None;
+		if (col.contacts[0].otherCollider == circle && groundColliders.Contains(col.collider)) {
+			groundColliders.Remove(col.collider);
+			if (groundColliders.Count == 0)
+				colFlags = CollisionFlags.None;
+		}
 	}
 
 	void FixedUpdate() {
@@ -121,10 +125,7 @@ public class MoveSkill : Skill {
 			realMovement += Vector2.right * jumpHorizontalSpeed;
 		jumpHorizontalSpeed *= HorizontalJumpDamping;
 		realMovement.y += Player.GetVerticalSpeed();
-		//realMovement *= Time.deltaTime;
 		body.velocity = realMovement * 1.5f;
-		//Debug.Log(body.velocity);
-		//colFlags = Components.CharacterController.Move(realMovement);
 		if (colFlags == CollisionFlags.CollidedBelow) {
 			velocity.y = Mathf.Max(0f, velocity.y);
 			hangTime = 0f;

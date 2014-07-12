@@ -73,8 +73,11 @@ public class ClimbSkill : Skill {
 		if (Climbing || !col.tag.Equals("Climbable"))
 			return;
 		if (col.gameObject.layer == 11) {
+			RopeNode rope = col.GetComponent<RopeNode>();
+			if (rope.ParentRope == ignoreRope)
+				return;
+			currentRopeNode = rope;
 			ropeClimbing = true;
-			currentRopeNode = col.GetComponent<RopeNode>();
 			currentRope = currentRopeNode.ParentRope;
 			CalculateRopePosition();
 		} else
@@ -97,9 +100,9 @@ public class ClimbSkill : Skill {
 			if (ropeClimbing) {
 				positionOnRopeNode += 0.05f * Speed;
 				if (InputManager.Left())
-					currentRopeNode.rigidbody2D.AddForceAtPosition(currentRopeNode.transform.right * -RopeSwingForce, handsPosition);
+					currentRopeNode.rigidbody2D.AddForceAtPosition(Vector2.right * -RopeSwingForce, handsPosition);
 				else if (InputManager.Right())
-					currentRopeNode.rigidbody2D.AddForceAtPosition(currentRopeNode.transform.right * RopeSwingForce, handsPosition);
+					currentRopeNode.rigidbody2D.AddForceAtPosition(Vector2.right * RopeSwingForce, handsPosition);
 			}
 			if (positionOnRopeNode > 1f) {
 				positionOnRopeNode -= 1f;
@@ -111,7 +114,7 @@ public class ClimbSkill : Skill {
 			}
 			if (InputManager.JumpButtonDown() || currentRopeNode == null) {
 				Climbing = false;
-				if (ropeClimbing)
+				if (ropeClimbing && currentRope != null)
 					moveSkill.velocity = currentRopeNode.rigidbody2D.velocity;
 				ignoreRope = currentRope;
 				if (ropeClimbStartFacing == 1f)

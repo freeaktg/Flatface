@@ -15,4 +15,10 @@ public class RopeNode : MonoBehaviour {
 		}
 	}
 	float myLegth;
+
+	public Vector2 GetPoint(float f) {
+		f -= 0.5f;
+		f *= Length;
+		return (Vector2)transform.TransformPoint(Vector3.down * f); 
+	}
 }
