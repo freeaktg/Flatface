@@ -10,7 +10,8 @@ public class PlatformerController : MonoBehaviour {
 
 	public enum Actions {
 		Jump,
-		ChangeDirection
+		ChangeDirection,
+		Move
 	}
 
 	List<Skill> allSkills = new List<Skill>();

@@ -1,23 +1,66 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class KeyboardInput : InputHandler {
-	public override bool JumpButtonDown() {
-		return Input.GetKeyDown(KeyCode.Space);
+	
+	public KeyboardInput() {
+		axises = new Dictionary<InputManager.AxisName, KeyboardAxis>() {
+			{ InputManager.AxisName.Horizontal, new KeyboardAxis() {
+					PositiveButton = KeyCode.RightArrow,
+					NegativeButton = KeyCode.LeftArrow 
+				}
+			},
+			{ InputManager.AxisName.Vertical, new KeyboardAxis() {
+					PositiveButton = KeyCode.UpArrow,
+					NegativeButton = KeyCode.DownArrow
+				}
+			},
+			{ InputManager.AxisName.Jump, new KeyboardAxis() {
+					PositiveButton = KeyCode.Space
+				}
+			},
+			{ InputManager.AxisName.Touch, new KeyboardAxis() {
+					PositiveButton = KeyCode.LeftCommand,
+					PositiveButton2 = KeyCode.LeftControl
+				}
+			}
+		};
 	}
-	public override bool Left() {
-		return Input.GetKey(KeyCode.LeftArrow);
+
+	Dictionary<InputManager.AxisName, KeyboardAxis> axises;
+
+	public override float GetAxis(InputManager.AxisName axis) {
+		if (!axises.ContainsKey(axis))
+			return 0f;
+		KeyboardAxis kbAxis = axises[axis];
+		if (Input.GetKey(kbAxis.PositiveButton) || Input.GetKey(kbAxis.PositiveButton2))
+			return 1f;
+		if (Input.GetKey(kbAxis.NegativeButton))
+			return -1f;
+		return 0f;
 	}
-	public override bool Right() {
-		return Input.GetKey(KeyCode.RightArrow);
+
+	public override InputManager.AxisState GetAxisState(InputManager.AxisName axis) {
+		if (!axises.ContainsKey(axis))
+			return InputManager.AxisState.Idle;
+		KeyboardAxis kbAxis = axises[axis];
+		if (Input.GetKeyDown(kbAxis.PositiveButton) || Input.GetKeyDown(kbAxis.PositiveButton2) ||
+		    Input.GetKeyDown(kbAxis.NegativeButton))
+			return InputManager.AxisState.Down;
+		if (Input.GetKeyUp(kbAxis.PositiveButton) || Input.GetKeyUp(kbAxis.PositiveButton2) || 
+		    Input.GetKeyUp(kbAxis.NegativeButton))
+			return InputManager.AxisState.Up;
+		if (Input.GetKey(kbAxis.PositiveButton) || Input.GetKey(kbAxis.PositiveButton2) || 
+		    Input.GetKey(kbAxis.NegativeButton))
+			return InputManager.AxisState.Pressed;
+		return InputManager.AxisState.Idle;
+
 	}
-	public override bool Up() {
-		return Input.GetKey(KeyCode.UpArrow);
-	}
-	public override bool Down() {
-		return Input.GetKey(KeyCode.DownArrow);
-	}
-	public override bool TouchDown() {
-		return Input.GetKeyDown(KeyCode.LeftCommand) || Input.GetKeyDown(KeyCode.LeftControl);
+
+	struct KeyboardAxis {
+		public KeyCode PositiveButton;
+		public KeyCode PositiveButton2;
+		public KeyCode NegativeButton;
 	}
 }

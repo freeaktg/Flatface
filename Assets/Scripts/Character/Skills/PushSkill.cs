@@ -55,19 +55,28 @@ public class PushSkill : Skill {
 			pushablePos.x = transform.position.x + pushableOffset.x;
 			Collider2D[] cols = Physics2D.OverlapCircleAll(pushablePos, m_pushable.transform.localScale.x * 0.4f);
 			if (cols.Length <= 1)
-			//	m_pushable.MovePosition(pushablePos);
 				m_pushable.transform.position = pushablePos;
 		}
 	}
 
 	public override void OnUpdate() {
-		if (m_pushable) {
-			if (InputManager.TouchButtonDown()) {
-				Pushing = !Pushing;
-				if (!Pushing) {
-					PushIdle = false;
-					Pulling = false;
+		if (InputManager.GetAxisState(InputManager.AxisName.Touch) == InputManager.AxisState.Down) {
+			RaycastHit2D hit;
+			if (!Pushing) {
+				hit = HandRaycast();
+				if (hit.collider != null
+				) {
+					OnHandsEnterRaycast(hit.collider);
+					if (m_pushable) {
+						Pushing = true;
+						m_pushable.isKinematic = false;
+					}
 				}
+			} else 
+				Pushing = false;
+			if (!Pushing) {
+				PushIdle = false;
+				Pulling = false;
 			}
 		}
 		if (m_pushable && Pushing) {
@@ -76,7 +85,7 @@ public class PushSkill : Skill {
 				Pushing = false;
 				Pulling = false;
 				PushIdle = false;
-			} else if (InputManager.Left() || InputManager.Right()) {
+			} else if (InputManager.GetAxis(InputManager.AxisName.Horizontal) != 0f) {
 				PushIdle = false;
 				CurrentPushSpeed = PushSpeed;
 			} else {
@@ -85,15 +94,9 @@ public class PushSkill : Skill {
 			}
 			if (m_pushable)
 				Pulling = Player.GetFacingDirection() != Mathf.Sign(moveSkill.movementSpeed) && moveSkill.movementSpeed != 0;
+			if (HandRaycast().collider == null)
+				Release();
 		}
-		RaycastHit2D hit;
-		if ((hit = Physics2D.Raycast((Vector2)transform.position + Vector2.up * Player.Height * transform.localScale.y * 0.5f
-		                            ,//+ Vector3.right * Player.GetFacingDirection() * (RaycastDistance * 0.5f), 
-		                            Vector2.right * Player.GetFacingDirection(), RaycastDistance * 1f, 1 << 9)).collider != null
-		    ) {
-			OnHandsEnterRaycast(hit.collider);
-		} else if (m_pushable != null && !Pulling)
-			OnHandsExitRaycast(m_pushable.collider2D);
 	}
 
 	public override bool IsActionBlocked(PlatformerController.Actions action) {
@@ -115,6 +118,11 @@ public class PushSkill : Skill {
 	bool isFalling(Rigidbody2D body) {
 		return false;
 		//return Mathf.Abs(body.angularVelocity.z) > 1f && (m_pushable == null || m_pushable.velocity.y < -0.03f);
+	}
+
+	RaycastHit2D HandRaycast() {
+		return Physics2D.Raycast((Vector2)transform.position + Vector2.up * Player.Height * 0.9f
+		                        ,Vector2.right * Player.GetFacingDirection(), RaycastDistance, 1 << 9);
 	}
 
 	void OnHandsEnterRaycast(Collider2D col) {

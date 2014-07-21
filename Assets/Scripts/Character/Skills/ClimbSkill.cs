@@ -5,6 +5,7 @@ using System.Collections;
 [RequireComponent(typeof(HoistSkill))]
 public class ClimbSkill : Skill {
 
+	public float		ClimbSpeed = 1f;
 	public float		RopeSwingForce = 1f;
 
 	AnimatorParam<bool> climbing;
@@ -13,13 +14,31 @@ public class ClimbSkill : Skill {
 	float				climbableMaxY;
 	bool				ropeClimbing;
 	Rope				currentRope;
-	RopeNode			currentRopeNode;
 	float				positionOnRopeNode;
 	Transform			handsListener;
 	Vector3				handsOffset;
 	int					ropeClimbStartFacing;
 	Vector3				handsPosition;
 	Rope				ignoreRope;
+	RopeNode			_currentRopeNode;
+	RopeNode			currentRopeNode {
+		get {
+			return _currentRopeNode;
+		}
+		set {
+			if (_currentRopeNode != value) {
+				if (value != null) {
+					value.rigidbody2D.mass += rigidbody2D.mass;
+					//value.rigidbody2D.centerOfMass = value.transform.worldToLocalMatrix.MultiplyPoint3x4(rigidbody2D.worldCenterOfMass);
+				}
+				if (_currentRopeNode != null) {
+					_currentRopeNode.rigidbody2D.mass -= rigidbody2D.mass;
+					//_currentRopeNode.rigidbody2D.centerOfMass = Vector2.zero;
+				}
+				_currentRopeNode = value;
+			}
+		}
+	}
 
 	public override void OnStart() {
 		climbing = new AnimatorParam<bool>(this, "Climbing");
@@ -33,9 +52,12 @@ public class ClimbSkill : Skill {
 			return climbing;
 		}
 		set {
-			if (!value)
-				Speed = 1f;
-			climbing.Set(value);
+			if (value != climbing) {
+				rigidbody2D.isKinematic = value;
+				if (!value)
+					Speed = 1f;
+				climbing.Set(value);
+			}
 		}
 	}
 
@@ -53,16 +75,19 @@ public class ClimbSkill : Skill {
 	}
 
 	public override bool UpdatePosition() {
-		if (Climbing && ropeClimbing) {
-			handsPosition = Vector3.Lerp(
-				currentRopeNode.transform.TransformPoint(Vector3.down * (currentRopeNode.Length / 2f)),
-				currentRopeNode.transform.TransformPoint(Vector3.up * (currentRopeNode.Length / 2f)),
-				positionOnRopeNode) - currentRopeNode.transform.TransformDirection(handsOffset);
-			transform.position = handsPosition;
-			transform.rotation = currentRopeNode.transform.rotation;
-			return true;
+		if (Climbing) {
+			if (ropeClimbing) {
+				handsPosition = Vector3.Lerp(
+					currentRopeNode.transform.TransformPoint(Vector3.down * (currentRopeNode.Length / 2f)),
+					currentRopeNode.transform.TransformPoint(Vector3.up * (currentRopeNode.Length / 2f)),
+					positionOnRopeNode) - currentRopeNode.transform.TransformDirection(handsOffset);
+				transform.position = handsPosition;
+				transform.rotation = currentRopeNode.transform.rotation;
+			} else {
+				transform.position += Vector3.up * (Time.deltaTime * Speed);
+			}
 		}
-		return false;
+		return Climbing;
 	}
 
 	public override float GetGravity() {
@@ -86,23 +111,17 @@ public class ClimbSkill : Skill {
 		Climbing = true;
 		Player.Animator.Play("climb", 0, 1000);
 		moveSkill.velocity = Vector2.zero;
+		rigidbody2D.velocity = Vector2.zero;
 		climbableMaxY = col.GetBounds().max.y;
 	}
 
 	public override void OnUpdate() {
 		if (Climbing) {
-			if (InputManager.Up())
-				Speed = 1f;
-			else if (InputManager.Down())
-				Speed = -1f;
-			else
-				Speed = 0f;
+			Speed = InputManager.GetAxis(InputManager.AxisName.Vertical);
 			if (ropeClimbing) {
 				positionOnRopeNode += 0.05f * Speed;
-				if (InputManager.Left())
-					currentRopeNode.rigidbody2D.AddForceAtPosition(Vector2.right * -RopeSwingForce, handsPosition);
-				else if (InputManager.Right())
-					currentRopeNode.rigidbody2D.AddForceAtPosition(Vector2.right * RopeSwingForce, handsPosition);
+				if (InputManager.GetAxisState(InputManager.AxisName.Horizontal) == InputManager.AxisState.Down)
+					currentRopeNode.rigidbody2D.AddForce(Vector2.right * InputManager.GetAxis(InputManager.AxisName.Horizontal) * RopeSwingForce, ForceMode2D.Impulse);
 			}
 			if (positionOnRopeNode > 1f) {
 				positionOnRopeNode -= 1f;
@@ -112,10 +131,10 @@ public class ClimbSkill : Skill {
 				positionOnRopeNode += 1f;
 				currentRopeNode = currentRopeNode.BottomNode;
 			}
-			if (InputManager.JumpButtonDown() || currentRopeNode == null) {
+			if (InputManager.GetAxisState(InputManager.AxisName.Jump) == InputManager.AxisState.Down || (ropeClimbing && currentRopeNode == null)) {
 				Climbing = false;
-				if (ropeClimbing && currentRope != null)
-					moveSkill.velocity = currentRopeNode.rigidbody2D.velocity;
+				//if (ropeClimbing && currentRope != null)
+				//	moveSkill.velocity = currentRopeNode.rigidbody2D.velocity;
 				ignoreRope = currentRope;
 				if (ropeClimbStartFacing == 1f)
 					transform.rotation = Quaternion.identity;
@@ -132,6 +151,8 @@ public class ClimbSkill : Skill {
 
 	public override bool IsActionBlocked(PlatformerController.Actions action) {
 		if (action == PlatformerController.Actions.ChangeDirection)
+			return Climbing;
+		if (action == PlatformerController.Actions.Move)
 			return Climbing;
 		return false;
 	}

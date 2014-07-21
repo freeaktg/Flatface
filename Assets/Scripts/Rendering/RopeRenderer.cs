@@ -9,8 +9,13 @@ public class RopeRenderer : MonoBehaviour {
 	Mesh mesh;
 	Rope rope;
 	int numberOfSegments;
+	Camera mainCamera;
+	Transform mainCameraTransform;
+	Rect bounds;
 
 	void Start() {
+		mainCamera = Camera.main;
+		mainCameraTransform = mainCamera.transform;
 		rope = GetComponent<Rope>();
 		numberOfSegments = NumberOfSegments;
 		if (fract(numberOfSegments / (rope.Nodes.Length)) < 0.0001f)
@@ -49,9 +54,10 @@ public class RopeRenderer : MonoBehaviour {
 		mesh.normals = normals;
 		Vector2 p0 = rope.Nodes[0].GetPoint(0f);
 		Vector2 p1 = rope.Nodes[rope.Nodes.Length - 1].GetPoint(1f);
-		mesh.bounds = new Bounds((p0 + p1) / 2f - (Vector2)transform.position, new Vector3(5f, p1.y - p0.y, 1f));
-		Debug.Log(
-		BezierCurve(new Vector2(0, 0), new Vector2(2, 0), new Vector2(1, 1), 0.5f));
+		float width = Mathf.Abs(p0.y - p1.y);
+		mesh.bounds = new Bounds((p0 + p1) / 2f - (Vector2)transform.position, new Vector3(width, -width, 1f));
+		bounds = new Rect(transform.position.x - width / 2f, transform.position.y - width, width, width);
+		//BezierCurve(new Vector2(0, 0), new Vector2(2, 0), new Vector2(1, 1), 0.5f));
 	}
 
 	float fract(float f) {
@@ -59,6 +65,14 @@ public class RopeRenderer : MonoBehaviour {
 	}
 
 	void Update() {
+		float distance = -mainCameraTransform.position.z;
+		float frustumHeight = 2.0f * distance * Mathf.Tan(mainCamera.fieldOfView * 0.5f * Mathf.Deg2Rad);
+		float frustumWidth = frustumHeight * (Screen.width / (float)Screen.height);
+		Rect frustumBounds = new Rect(mainCameraTransform.position.x - frustumWidth / 2f, mainCameraTransform.position.y - frustumHeight / 2f,
+		                              frustumWidth, frustumHeight);
+		if (!frustumBounds.Overlaps(bounds))
+			return;
+
 		Vector2[] ropePoints = new Vector2[numberOfSegments + 1];
 		for (int i = 0; i < numberOfSegments + 1; i++) {
 			float f = i / (float)numberOfSegments;

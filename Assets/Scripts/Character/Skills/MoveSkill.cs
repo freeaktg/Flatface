@@ -59,20 +59,20 @@ public class MoveSkill : Skill {
 
 	public override void OnUpdate() {
 		if (IsGrounded) {
-			if (InputManager.JumpButtonDown() && !Player.IsActionBlocked(PlatformerController.Actions.Jump)) {
+			if (InputManager.GetAxisState(InputManager.AxisName.Jump) == InputManager.AxisState.Down && !Player.IsActionBlocked(PlatformerController.Actions.Jump)) {
 				jumpTrigger.Set();
 				velocity.y += JumpVelocity.y;
 				jumpHorizontalSpeed = JumpVelocity.x * FacingDirection;
 				leftParam.Set(false);
 				rightParam.Set(false);
 				movementSpeed = 0f;
-			} else if (InputManager.Left()) {
+			} else if (InputManager.GetAxis(InputManager.AxisName.Horizontal) < 0f) {
 				leftParam.Set(true);
 				rightParam.Set(false);
 				movementSpeed = -RunVelocity;
 				if (!Player.IsActionBlocked(PlatformerController.Actions.ChangeDirection))
 					FacingDirection = -1;
-			} else if (InputManager.Right()) {
+			} else if (InputManager.GetAxis(InputManager.AxisName.Horizontal) > 0f) {
 				rightParam.Set(true);
 				leftParam.Set(false);
 				movementSpeed = RunVelocity;
@@ -124,7 +124,6 @@ public class MoveSkill : Skill {
 		else
 			realMovement += Vector2.right * jumpHorizontalSpeed;
 		jumpHorizontalSpeed *= HorizontalJumpDamping;
-		realMovement.y += Player.GetVerticalSpeed();
 		body.velocity = realMovement * 1.5f;
 		if (colFlags == CollisionFlags.CollidedBelow) {
 			velocity.y = Mathf.Max(0f, velocity.y);

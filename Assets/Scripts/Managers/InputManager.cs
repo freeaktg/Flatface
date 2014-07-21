@@ -1,7 +1,21 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class InputManager {
+public static class InputManager {
+
+	public enum AxisName {
+		Jump,
+		Horizontal,
+		Vertical,
+		Touch
+	}
+
+	public enum AxisState {
+		Idle,
+		Down,
+		Pressed,
+		Up
+	}
 
 	static InputHandler _handler;
 	private static InputHandler handler {
@@ -17,36 +31,16 @@ public class InputManager {
 		}
 	}
 
-	public static bool JumpButtonDown() {
-		return handler.JumpButtonDown();
+	public static float GetAxis(AxisName axis) {
+		return handler.GetAxis(axis);
 	}
 
-	public static bool Right() {
-		return handler.Right();
-	}
-
-	public static bool Left() {
-		return handler.Left();
-	}
-
-	public static bool Up() {
-		return handler.Up();
-	}
-
-	public static bool Down() {
-		return handler.Down();
-	}
-
-	public static bool TouchButtonDown() {
-		return handler.TouchDown();
+	public static AxisState GetAxisState(AxisName axis) {
+		return handler.GetAxisState(axis);
 	}
 }
 
 public abstract class InputHandler {
-	public virtual bool JumpButtonDown() { return false; }
-	public virtual bool Right() { return false; }
-	public virtual bool Left() { return false; }
-	public virtual bool Up() { return false; }
-	public virtual bool Down() { return false; }
-	public virtual bool TouchDown() { return false; }
+	public virtual float GetAxis(InputManager.AxisName axis) { return 0f; }
+	public virtual InputManager.AxisState GetAxisState(InputManager.AxisName axis) { return InputManager.AxisState.Idle; }
 }
