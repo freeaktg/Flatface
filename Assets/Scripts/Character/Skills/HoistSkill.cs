@@ -44,6 +44,7 @@ public class HoistSkill : Skill {
 		hoisting = true;
 		moveSkill.velocity = Vector2.zero;
 		this.high = high;
+		Player.CollidersEnabled = false;
 	}
 
 	public override bool IsActionBlocked(PlatformerController.Actions action) {
@@ -86,6 +87,7 @@ public class HoistSkill : Skill {
 					hoistStarted = false;
 					transform.position = hoistPos + new Vector3(0f, high ? 0.2f : 0.1f, 0f);
 					Player.SpriteTransform.localPosition = Vector2.zero;
+					Player.CollidersEnabled = true;
 				}
 			}
 		}

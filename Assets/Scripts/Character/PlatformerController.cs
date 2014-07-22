@@ -7,6 +7,24 @@ public class PlatformerController : MonoBehaviour {
 	public Transform SpriteTransform;
 	public float Height;
 	public Animator Animator { get; private set; }
+	
+	bool _collidersEnabled = true;
+	public MoveSkill moveSkill { get; set; }
+	public bool CollidersEnabled {
+		get {
+			return _collidersEnabled;
+		}
+		set {
+			if (value != _collidersEnabled) {
+				_collidersEnabled = value;
+				Collider2D[] cols = GetComponents<Collider2D>();
+				foreach (Collider2D col in cols)
+					col.enabled = value;
+				if (!value)
+					moveSkill.ResetGroundColliders();
+			}
+		}
+	}
 
 	public enum Actions {
 		Jump,

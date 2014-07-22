@@ -54,6 +54,7 @@ public class MoveSkill : Skill {
 		leftParam = new AnimatorParam<bool>(Components.Animator, "Left");
 		rightParam = new AnimatorParam<bool>(Components.Animator, "Right");
 		circle = GetComponent<CircleCollider2D>();
+		Player.moveSkill = this;
 		body = rigidbody2D;
 	}
 
@@ -101,9 +102,8 @@ public class MoveSkill : Skill {
 		}
 	}
 
-	void OnCollisionStay2D(Collision2D col) {
-		//if (col.contacts[0].otherCollider == circle)
-		//	colFlags = CollisionFlags.Below;
+	public void ResetGroundColliders() {
+		groundColliders.Clear();
 	}
 
 	void OnCollisionExit2D(Collision2D col) {
